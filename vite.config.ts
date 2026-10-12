@@ -23,7 +23,7 @@ function resumoDeDesenvolvimento(): Plugin {
 
 export default defineConfig({
   base: process.env.BASE ?? '/painel-celular/',
-  resolve: { alias: { '@shared': resolve(__dirname, '../Painel Academico App/src/shared') } },
+  resolve: { alias: { '@shared': resolve(__dirname, '../src/shared') } },
   server: { fs: { allow: ['..'] } },
   plugins: [
     react(),
