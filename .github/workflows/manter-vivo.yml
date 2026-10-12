@@ -1,0 +1,15 @@
+# Dá um "toque" diário no Supabase (função ping, sem dados) para o projeto grátis não pausar por inatividade.
+name: Manter o Supabase vivo
+on:
+  schedule:
+    - cron: '17 9 * * *'
+  workflow_dispatch:
+jobs:
+  toque:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ping
+        run: |
+          curl -fsS -X POST "https://cyfjxfkffijqzoleetpj.supabase.co/rest/v1/rpc/ping" \
+            -H "apikey: sb_publishable_Vou3CkpBwtxgPgpuDyLLdQ_OpJtJwcI" \
+            -H "Content-Type: application/json" -d '{}'
