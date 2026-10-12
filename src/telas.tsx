@@ -8,6 +8,7 @@ import { contagem, NOMES_TIPO, ordenarProvas } from '@shared/provas'
 import { nomeDaProva } from '@shared/regras'
 import { diaDaSemana, formatarDiaMes, mesPorExtenso } from '@shared/datas'
 import { datasDoDia, datasDoMes, tipoPrincipal } from '@shared/calendarioUEM'
+import { Estudos, Materiais } from './estudos'
 
 /** Semestre atual da UEM: 1º de março a julho, 2º de agosto a dezembro. */
 function semestreAtual(hoje: string): { ano: number; semestre: number } {
@@ -311,7 +312,9 @@ export function Provas({ r }: { r: ResumoCelular }) {
 
 // ---------------------------------------------------------------------------------------- Mais
 export function Mais({ r, onSair }: { r: ResumoCelular; onSair?: () => void }) {
-  const [parte, setParte] = useState<'menu' | 'avisos' | 'curso'>('menu')
+  const [parte, setParte] = useState<'menu' | 'avisos' | 'curso' | 'materiais' | 'estudos'>('menu')
+  if (parte === 'materiais') return <Materiais r={r} onVoltar={() => setParte('menu')} />
+  if (parte === 'estudos') return <Estudos r={r} onVoltar={() => setParte('menu')} />
   if (parte === 'avisos') {
     return (
       <>
@@ -352,7 +355,8 @@ export function Mais({ r, onSair }: { r: ResumoCelular; onSair?: () => void }) {
       <section className="cartao menu-mais">
         <button onClick={() => setParte('avisos')}><span>Avisos</span>{r.naoLidas > 0 && <i className="bolinha">{r.naoLidas}</i>}<b>›</b></button>
         <button onClick={() => setParte('curso')}><span>Curso (AAC, AEC)</span><b>›</b></button>
-        <div className="em-breve"><span>Materiais e Estudos</span><small>em breve</small></div>
+        <button onClick={() => setParte('materiais')}><span>Materiais</span>{r.materiais.some((m) => !m.lido) && <i className="bolinha neutra">{r.materiais.filter((m) => !m.lido).length}</i>}<b>›</b></button>
+        <button onClick={() => setParte('estudos')}><span>Estudos</span>{r.cartoesDevidos.length > 0 && <i className="bolinha neutra">{r.cartoesDevidos.length}</i>}<b>›</b></button>
         {onSair && <button className="sair" onClick={onSair}><span>Sair</span></button>}
       </section>
     </>
