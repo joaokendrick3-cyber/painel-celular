@@ -29,6 +29,9 @@ export default defineConfig({
     react(),
     resumoDeDesenvolvimento(),
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
       includeAssets: ['icone-180.png'],
       manifest: {
@@ -40,7 +43,7 @@ export default defineConfig({
           { src: 'icone-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' }
         ]
       },
-      workbox: { navigateFallback: 'index.html', globPatterns: ['**/*.{js,css,html,png,woff2,svg}'] }
+      injectManifest: { globPatterns: ['**/*.{js,css,html,png,woff2,svg}'] }
     })
   ]
 })

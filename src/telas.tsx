@@ -9,6 +9,7 @@ import { nomeDaProva } from '@shared/regras'
 import { diaDaSemana, formatarDiaMes, mesPorExtenso } from '@shared/datas'
 import { datasDoDia, datasDoMes, tipoPrincipal } from '@shared/calendarioUEM'
 import { Estudos, Materiais } from './estudos'
+import AvisosPush from './avisosPush'
 
 /** Semestre atual da UEM: 1º de março a julho, 2º de agosto a dezembro. */
 function semestreAtual(hoje: string): { ano: number; semestre: number } {
@@ -352,6 +353,7 @@ export function Mais({ r, onSair }: { r: ResumoCelular; onSair?: () => void }) {
   return (
     <>
       <Titulo>Mais</Titulo>
+      <AvisosPush vapidPublica={r.vapidPublica} />
       <section className="cartao menu-mais">
         <button onClick={() => setParte('avisos')}><span>Avisos</span>{r.naoLidas > 0 && <i className="bolinha">{r.naoLidas}</i>}<b>›</b></button>
         <button onClick={() => setParte('curso')}><span>Curso (AAC, AEC)</span><b>›</b></button>
