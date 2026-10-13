@@ -153,7 +153,6 @@
 
 /* A página nunca rola (o app cabe na janela; só o conteúdo de cada aba rola por dentro). O app escondido sobe 18 px e
    isso criava uma barra de rolagem na lateral da capa. */
-html, body { overflow: hidden; }
 
 /* Voltando para a capa pelo ícone do menu: ela chega de fora para dentro (inverso da saída). */
 .capa.voltando { animation: capa-volta 0.8s cubic-bezier(.22, 1, .36, 1) both; }
