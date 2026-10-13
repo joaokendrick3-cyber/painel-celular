@@ -173,3 +173,13 @@ a.material { color: inherit; text-decoration: none; }
 .marca-toque { cursor: pointer; }
 
 .etiqueta-disc { border-radius: 12px; font-size: 12px; padding: 3px 10px; }
+
+/* Avisos: abas, marcar como lido */
+.botao-todas { width: 100%; margin: 6px 0 2px; height: 46px; }
+.botao-todas:disabled { opacity: .4; }
+.botao-pequeno { height: 36px; padding: 0 14px; font-size: 13px; flex: none; align-self: flex-start; margin-top: 4px; }
+.aviso-item { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-top: 1px solid var(--borda); }
+.aviso-item:first-child { border-top: 0; }
+.aviso-item.lida { opacity: .65; }
+.aviso-item .botao-pequeno { align-self: flex-start; }
+.suave-aviso { color: var(--ciano-txt); background: color-mix(in srgb, var(--ciano) 12%, transparent); }

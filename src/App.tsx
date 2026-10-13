@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Capa from './Capa'
 import type { ResumoCelular } from '@shared/celular'
 import { baixarResumo, lerCache, limparCache, supabase, temSupabase, VERSAO_ENTENDIDA } from './dados'
 import Entrada from './Entrada'
+import { comLocal, confirmar, enviarFila, lerLocal, marcar, marcarTodas, type Local } from './avisos'
 import { Inicio, Faltas, Notas, Provas, Mais } from './telas'
 
 type Aba = 'inicio' | 'faltas' | 'notas' | 'provas' | 'mais'
@@ -15,7 +16,9 @@ const ABAS: { id: Aba; nome: string; icone: string }[] = [
 ]
 
 function Conteudo({ onCapa }: { onCapa: () => void }) {
-  const [resumo, setResumo] = useState<ResumoCelular | null>(() => lerCache())
+  const [base, setBase] = useState<ResumoCelular | null>(() => lerCache())
+  const [local, setLocal] = useState<Local>(() => lerLocal())   // avisos marcados no celular, ainda não confirmados pelo computador
+  const resumo = useMemo(() => (base ? comLocal(base, local) : null), [base, local])
   const [logado, setLogado] = useState<boolean | null>(temSupabase ? null : true)
   const [aba, setAba] = useState<Aba>('inicio')
   const [erro, setErro] = useState('')
@@ -25,7 +28,10 @@ function Conteudo({ onCapa }: { onCapa: () => void }) {
     setCarregando(true)
     setErro('')
     try {
-      setResumo(await baixarResumo())
+      const novo = await baixarResumo()
+      setBase(novo)
+      setLocal(confirmar(novo, lerLocal()))
+      void enviarFila()
     } catch (e) {
       setErro(lerCache() ? 'Sem conexão: mostrando o último resumo salvo.' : (e as Error).message)
     } finally {
@@ -67,7 +73,7 @@ function Conteudo({ onCapa }: { onCapa: () => void }) {
   const sair = async (): Promise<void> => {
     await supabase?.auth.signOut()
     limparCache()
-    setResumo(null)
+    setBase(null)
   }
 
   if (!resumo) {
@@ -96,7 +102,7 @@ function Conteudo({ onCapa }: { onCapa: () => void }) {
         {aba === 'faltas' && <Faltas r={resumo} />}
         {aba === 'notas' && <Notas r={resumo} />}
         {aba === 'provas' && <Provas r={resumo} />}
-        {aba === 'mais' && <Mais r={resumo} onSair={supabase ? () => void sair() : undefined} />}
+        {aba === 'mais' && <Mais r={resumo} onSair={supabase ? () => void sair() : undefined} onMarcar={(id, lida) => setLocal(marcar(id, lida, local))} onMarcarTodas={() => setLocal(marcarTodas(resumo, local))} />}
       </main>
       <nav className="barra">
         {ABAS.map((a) => (

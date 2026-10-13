@@ -9,6 +9,7 @@ import { nomeDaProva } from '@shared/regras'
 import { diaDaSemana, formatarDiaMes, mesPorExtenso } from '@shared/datas'
 import { datasDoDia, datasDoMes, tipoPrincipal } from '@shared/calendarioUEM'
 import { Disc, NomeDisc } from './disciplinas'
+import { erroDaFila, tamanhoDaFila } from './avisos'
 import { Estudos, Materiais } from './estudos'
 import AvisosPush from './avisosPush'
 
@@ -313,27 +314,11 @@ export function Provas({ r }: { r: ResumoCelular }) {
 }
 
 // ---------------------------------------------------------------------------------------- Mais
-export function Mais({ r, onSair }: { r: ResumoCelular; onSair?: () => void }) {
+export function Mais({ r, onSair, onMarcar, onMarcarTodas }: { r: ResumoCelular; onSair?: () => void; onMarcar: (id: number, lida: boolean) => void; onMarcarTodas: () => void }) {
   const [parte, setParte] = useState<'menu' | 'avisos' | 'curso' | 'materiais' | 'estudos'>('menu')
   if (parte === 'materiais') return <Materiais r={r} onVoltar={() => setParte('menu')} />
   if (parte === 'estudos') return <Estudos r={r} onVoltar={() => setParte('menu')} />
-  if (parte === 'avisos') {
-    return (
-      <>
-        <button className="voltar" onClick={() => setParte('menu')}>‹ Mais</button>
-        <Titulo>Avisos</Titulo>
-        <section className="cartao">
-          {r.avisos.slice(0, 60).map((a) => (
-            <div className={`linha aviso ${a.lida ? 'lida' : ''}`} key={a.id}>
-              <div className="col"><strong>{a.titulo}</strong><small>{a.mensagem}</small><small className="suave">{a.criadoEm.slice(8, 10)}/{a.criadoEm.slice(5, 7)} {a.criadoEm.slice(11, 16)}</small></div>
-              {!a.lida && <i className="ponto" />}
-            </div>
-          ))}
-          {r.avisos.length === 0 && <span className="suave">Nenhum aviso.</span>}
-        </section>
-      </>
-    )
-  }
+  if (parte === 'avisos') return <Avisos r={r} onVoltar={() => setParte('menu')} onMarcar={onMarcar} onMarcarTodas={onMarcarTodas} />
   if (parte === 'curso') {
     const h = r.curso.horas
     return (
@@ -361,6 +346,47 @@ export function Mais({ r, onSair }: { r: ResumoCelular; onSair?: () => void }) {
         <button onClick={() => setParte('materiais')}><span>Materiais</span>{r.materiais.some((m) => !m.lido) && <i className="bolinha neutra">{r.materiais.filter((m) => !m.lido).length}</i>}<b>›</b></button>
         <button onClick={() => setParte('estudos')}><span>Estudos</span>{r.cartoesDevidos.length > 0 && <i className="bolinha neutra">{r.cartoesDevidos.length}</i>}<b>›</b></button>
         {onSair && <button className="sair" onClick={onSair}><span>Sair</span></button>}
+      </section>
+    </>
+  )
+}
+
+// ---------------------------------------------------------------------------------------- Avisos (igual ao do computador)
+const quandoAviso = (s: string): string => `${s.slice(8, 10)}/${s.slice(5, 7)}/${s.slice(0, 4)} ${s.slice(11, 16)}`
+
+function Avisos({ r, onVoltar, onMarcar, onMarcarTodas }: { r: ResumoCelular; onVoltar: () => void; onMarcar: (id: number, lida: boolean) => void; onMarcarTodas: () => void }) {
+  const [aba, setAba] = useState<'nao-lidas' | 'lidas'>('nao-lidas')
+  const naoLidas = r.avisos.filter((a) => !a.lida)
+  const lidas = r.avisos.filter((a) => a.lida)
+  const mostradas = (aba === 'lidas' ? lidas : naoLidas).slice(0, 80)
+  const pendentes = tamanhoDaFila()
+  return (
+    <>
+      <button className="voltar" onClick={onVoltar}>‹ Mais</button>
+      <Titulo>Avisos</Titulo>
+      <div className="segmentos">
+        <button className={aba === 'nao-lidas' ? 'ativa' : ''} onClick={() => setAba('nao-lidas')}>Não lidas ({naoLidas.length})</button>
+        <button className={aba === 'lidas' ? 'ativa' : ''} onClick={() => setAba('lidas')}>Lidas ({lidas.length})</button>
+      </div>
+      {aba === 'nao-lidas' && (
+        <button className="botao botao-todas" disabled={naoLidas.length === 0} onClick={onMarcarTodas}>Marcar todas como lidas</button>
+      )}
+      {pendentes > 0 && <p className="faixa-erro suave-aviso">{erroDaFila() || 'Enviando a marcação para o computador…'}</p>}
+      <section className="cartao">
+        {mostradas.length === 0 ? (
+          <span className="suave">{aba === 'lidas' ? 'Nenhum aviso lido ainda. Os que você marcar como lidos ficam guardados aqui.' : 'Nenhum aviso novo.'}</span>
+        ) : (
+          mostradas.map((a) => (
+            <div className={`aviso-item ${a.lida ? 'lida' : ''}`} key={a.id}>
+              <div className="col">
+                <strong>{a.titulo}</strong>
+                <small>{a.mensagem}</small>
+                <small className="suave">{quandoAviso(a.criadoEm)}</small>
+              </div>
+              <button className="botao botao-pequeno" onClick={() => onMarcar(a.id, !a.lida)}>{a.lida ? 'Marcar como não lida' : 'Marcar como lida'}</button>
+            </div>
+          ))
+        )}
       </section>
     </>
   )
