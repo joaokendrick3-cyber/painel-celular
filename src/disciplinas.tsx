@@ -24,12 +24,17 @@ export function corDaDisciplina(nome: string): string {
   return EXTRAS[h % EXTRAS.length]
 }
 
-/** Nome da matéria numa etiqueta com a cor dela. */
-export function Disc({ nome }: { nome: string }) {
-  return <span className="etiqueta-disc" style={{ ['--cor-disc' as string]: corDaDisciplina(nome) }}>{nome}</span>
+/** Abreviação usada onde o nome inteiro não cabe (só na tela Início): "História do Pensamento Econômico I" vira "HPE I". */
+export function abreviar(nome: string): string {
+  return /pensamento economico i(\s|$)/.test(semAcento(nome)) ? 'HPE I' : nome
+}
+
+/** Nome da matéria numa etiqueta com a cor dela. `curto` troca pelo nome abreviado (a cor continua a mesma). */
+export function Disc({ nome, curto = false }: { nome: string; curto?: boolean }) {
+  return <span className="etiqueta-disc" style={{ ['--cor-disc' as string]: corDaDisciplina(nome) }}>{curto ? abreviar(nome) : nome}</span>
 }
 
 /** Nome da matéria em texto (títulos de cartão), na cor dela. */
-export function NomeDisc({ nome }: { nome: string }) {
-  return <strong className="nome-disc" style={{ ['--cor-disc' as string]: corDaDisciplina(nome) }}>{nome}</strong>
+export function NomeDisc({ nome, curto = false }: { nome: string; curto?: boolean }) {
+  return <strong className="nome-disc" style={{ ['--cor-disc' as string]: corDaDisciplina(nome) }}>{curto ? abreviar(nome) : nome}</strong>
 }

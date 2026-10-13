@@ -82,7 +82,7 @@ export function Inicio({ r, irPara }: { r: ResumoCelular; irPara: (aba: string) 
         {proxima && cont ? (
           <>
             <strong className="grande">{nomeAtividade(proxima)}</strong>
-            <span><Disc nome={proxima.disciplinaNome} /></span>
+            <span><Disc nome={proxima.disciplinaNome} curto /></span>
             <span className={`selo ${COR_URGENCIA[cont.urgencia]}`}>{cont.texto} · {formatarDiaMes(proxima.data!)}</span>
           </>
         ) : (
@@ -97,7 +97,7 @@ export function Inicio({ r, irPara }: { r: ResumoCelular; irPara: (aba: string) 
             const c = p.data ? contagem(p.data, r.hoje) : null
             return (
               <div className="linha" key={p.id}>
-                <div className="col"><strong>{nomeAtividade(p)}</strong><span><Disc nome={p.disciplinaNome} /></span></div>
+                <div className="col"><strong>{nomeAtividade(p)}</strong><span><Disc nome={p.disciplinaNome} curto /></span></div>
                 {c && <span className={`selo ${COR_URGENCIA[c.urgencia]}`}>{c.texto}</span>}
               </div>
             )
@@ -112,7 +112,7 @@ export function Inicio({ r, irPara }: { r: ResumoCelular; irPara: (aba: string) 
         ) : (
           painel.emRisco.map((l) => (
             <div className="linha risco" key={l.disciplinaId}>
-              <NomeDisc nome={l.nome} />
+              <NomeDisc nome={l.nome} curto />
               <div className="motivos">
                 {l.motivos.map((m) => <span key={m} className={`selo ${l.semaforo === 'vermelho' ? 'roxo' : 'ciano'}`}>{m}</span>)}
               </div>
