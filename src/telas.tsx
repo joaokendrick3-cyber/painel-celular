@@ -4,10 +4,11 @@ import type { Prova } from '@shared/tipos'
 import { mediaDoCurso, montarPainel } from '@shared/painel'
 import { calcularLimite, formatarAulas, formatarDias } from '@shared/faltas'
 import { avaliarDisciplina, formatarMedia, formatarNota, type Situacao } from '@shared/notas'
-import { contagem, NOMES_TIPO, ordenarProvas } from '@shared/provas'
+import { contagem, ordenarProvas } from '@shared/provas'
 import { nomeDaProva } from '@shared/regras'
 import { diaDaSemana, formatarDiaMes, mesPorExtenso } from '@shared/datas'
 import { datasDoDia, datasDoMes, tipoPrincipal } from '@shared/calendarioUEM'
+import { Disc, NomeDisc } from './disciplinas'
 import { Estudos, Materiais } from './estudos'
 import AvisosPush from './avisosPush'
 
@@ -81,7 +82,7 @@ export function Inicio({ r, irPara }: { r: ResumoCelular; irPara: (aba: string) 
         {proxima && cont ? (
           <>
             <strong className="grande">{nomeAtividade(proxima)}</strong>
-            <span>{proxima.disciplinaNome}</span>
+            <span><Disc nome={proxima.disciplinaNome} /></span>
             <span className={`selo ${COR_URGENCIA[cont.urgencia]}`}>{cont.texto} · {formatarDiaMes(proxima.data!)}</span>
           </>
         ) : (
@@ -96,7 +97,7 @@ export function Inicio({ r, irPara }: { r: ResumoCelular; irPara: (aba: string) 
             const c = p.data ? contagem(p.data, r.hoje) : null
             return (
               <div className="linha" key={p.id}>
-                <div className="col"><strong>{nomeAtividade(p)}</strong><small>{p.disciplinaNome}</small></div>
+                <div className="col"><strong>{nomeAtividade(p)}</strong><span><Disc nome={p.disciplinaNome} /></span></div>
                 {c && <span className={`selo ${COR_URGENCIA[c.urgencia]}`}>{c.texto}</span>}
               </div>
             )
@@ -111,7 +112,7 @@ export function Inicio({ r, irPara }: { r: ResumoCelular; irPara: (aba: string) 
         ) : (
           painel.emRisco.map((l) => (
             <div className="linha risco" key={l.disciplinaId}>
-              <strong>{l.nome}</strong>
+              <NomeDisc nome={l.nome} />
               <div className="motivos">
                 {l.motivos.map((m) => <span key={m} className={`selo ${l.semaforo === 'vermelho' ? 'roxo' : 'ciano'}`}>{m}</span>)}
               </div>
@@ -157,7 +158,7 @@ export function Faltas({ r }: { r: ResumoCelular }) {
         const selo = lim.semaforo === 'vermelho' ? ['Estourou', 'vermelho'] : lim.semaforo === 'amarelo' ? ['Atenção', 'ciano'] : ['Tranquilo', 'verde']
         return (
           <section className="cartao" key={f.disciplinaId} onClick={() => setAberta(aberta === f.disciplinaId ? null : f.disciplinaId)}>
-            <div className="linha topo-cartao"><strong>{f.nome}</strong><span className={`selo ${selo[1]}`}>{selo[0]}</span></div>
+            <div className="linha topo-cartao"><NomeDisc nome={f.nome} /><span className={`selo ${selo[1]}`}>{selo[0]}</span></div>
             <div className="barra-faltas"><i className="real" style={{ width: pctReal + '%' }} /><i className="plan" style={{ width: pctPlan + '%' }} /></div>
             <div className="quatro">
               <div><small>Realizadas</small><b>{formatarAulas(f.realizadasH)}</b></div>
@@ -256,7 +257,7 @@ export function Notas({ r }: { r: ResumoCelular }) {
         const media = exame && res.mediaFinalArredondada !== null ? res.mediaFinalArredondada : res.mediaArredondada
         return (
           <section className="cartao" key={n.disciplinaId}>
-            <div className="linha topo-cartao"><strong>{n.nome}</strong><span className={`selo ${COR_SITUACAO[res.situacao]}`}>{ROTULO[res.situacao]}</span></div>
+            <div className="linha topo-cartao"><NomeDisc nome={n.nome} /><span className={`selo ${COR_SITUACAO[res.situacao]}`}>{ROTULO[res.situacao]}</span></div>
             <div className="quatro dois">
               <div className="caixa"><small>P1</small><b>{formatarNota(n.p1)}</b></div>
               <div className="caixa"><small>P2</small><b>{formatarNota(n.p2)}</b></div>
@@ -285,7 +286,7 @@ export function Provas({ r }: { r: ResumoCelular }) {
       <div className="linha prova" key={p.id}>
         <div className="col">
           <strong>{nomeAtividade(p)}</strong>
-          <small>{p.disciplinaNome} · {NOMES_TIPO[p.tipo]}{p.hora ? ` · ${p.hora}` : ''}</small>
+          <span><Disc nome={p.disciplinaNome} />{p.hora ? <small className="hora-prova"> {p.hora}</small> : null}</span>
           {p.assuntos && <small className="assuntos">{p.assuntos}</small>}
         </div>
         <div className="col direita">

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { ResumoCelular } from '@shared/celular'
 import type { ItemClassroom, MaterialEstudo } from '@shared/tipos'
 import { formatarDiaMes } from '@shared/datas'
+import { Disc } from './disciplinas'
 
 type Pacote = ResumoCelular['pacotes'][number]
 
@@ -66,7 +67,7 @@ export function Materiais({ r, onVoltar }: { r: ResumoCelular; onVoltar: () => v
             <>
               <div className="col">
                 <strong>{m.titulo}</strong>
-                <small>{m.disciplinaNome} · {ROTULO_TIPO[m.tipo] ?? m.tipo} · {dataCurta(m.publicadoEm)}</small>
+                <span><Disc nome={m.disciplinaNome} /> <small>{ROTULO_TIPO[m.tipo] ?? m.tipo} · {dataCurta(m.publicadoEm)}</small></span>
               </div>
               <div className="col direita">
                 {!m.lido ? <span className="selo roxo">novo</span> : <span className="selo neutro">lido</span>}
@@ -115,7 +116,7 @@ export function Estudos({ r, onVoltar }: { r: ResumoCelular; onVoltar: () => voi
       {r.pacotes.map((p) => (
         <section className="cartao clicavel" key={p.id} onClick={() => setPacote(p)}>
           <div className="linha topo-cartao"><strong>{p.titulo}</strong>{p.devidos > 0 && <span className="selo roxo">{p.devidos} p/ hoje</span>}</div>
-          <small className="suave">{p.disciplinaNome} · criado em {dataCurta(p.criadoEm)}</small>
+          <span><Disc nome={p.disciplinaNome} /> <small className="suave">criado em {dataCurta(p.criadoEm)}</small></span>
           <div className="quatro dois">
             <div><small>Flashcards</small><b>{p.flashcards}</b></div>
             <div><small>Simulado</small><b>{p.questoes} questões</b></div>

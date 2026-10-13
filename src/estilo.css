@@ -163,3 +163,13 @@ a.material { color: inherit; text-decoration: none; }
 .alt.certa { border-color: var(--verde); background: color-mix(in srgb, var(--verde) 14%, transparent); }
 .alt.errada { border-color: #ef4444; background: color-mix(in srgb, #ef4444 14%, transparent); }
 .explicacao { margin: 4px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--painel-2); color: var(--texto-2); font-size: 14px; line-height: 1.45; }
+
+/* Matérias com a cor de cada uma (igual ao PAINEL do computador) */
+.etiqueta-disc { display: inline-block; padding: 3px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700; line-height: 1.3; background: color-mix(in srgb, var(--cor-disc) 20%, transparent); color: color-mix(in srgb, var(--cor-disc) 70%, #fff); border: 1px solid color-mix(in srgb, var(--cor-disc) 50%, transparent); }
+.nome-disc { color: color-mix(in srgb, var(--cor-disc) 80%, #fff); font-size: 16.5px; }
+.hora-prova { color: var(--texto-2); margin-left: 6px; }
+.marca-topo { display: flex; align-items: center; gap: 10px; }
+.icone-topo { width: 26px; height: 26px; border-radius: 7px; flex: none; }
+.marca-toque { cursor: pointer; }
+
+.etiqueta-disc { border-radius: 12px; font-size: 12px; padding: 3px 10px; }

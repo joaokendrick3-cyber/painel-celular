@@ -1,0 +1,160 @@
+/* Capa de abertura do PAINEL: mesmo desenho da capa do Portfólio, com o roxo no lugar do preto. */
+.capa {
+  --roxo-fundo: #2e1273;
+  --roxo-claro: #eee6ff;
+  --roxo-medio: #d6d3ff;
+  --titulo: #ffffff; /* com o roxo mais fundo, o branco é o que mais contrasta */
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: linear-gradient(140deg, #622ce0 0%, #4636ce 55%, #2a54d6 100%);
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+  color: #fff;
+  overflow: hidden;
+  transition: opacity 0.75s cubic-bezier(.4, 0, .2, 1), transform 0.9s cubic-bezier(.22, 1, .36, 1);
+}
+/* camada própria só durante as transições (parada, uma camada gigante a mais só atrapalharia) */
+.capa.saindo, .capa.voltando { will-change: opacity, transform; }
+.capa.saindo { opacity: 0; transform: scale(1.06); pointer-events: none; }
+.capa-fundo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+.capa-conteudo {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  text-align: center;
+  padding: 0 16px;
+  pointer-events: none; /* o mouse passa para o fundo, menos no título e no controle */
+}
+
+/* ---------- Título ---------- */
+.capa .titulo {
+  margin: 0;
+  font-size: clamp(64px, 19vw, 320px);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 0.9;
+  display: flex;
+  color: var(--titulo);
+}
+.capa .titulo .letra {
+  display: inline-block;
+  pointer-events: auto;
+  cursor: default;
+  translate: 0 0;
+  transition: translate 0.35s cubic-bezier(.3, 1.6, .5, 1), color 0.3s;
+  animation: letra-entra 0.9s cubic-bezier(.2, .8, .2, 1) both;
+  animation-delay: calc(var(--i) * 70ms);
+}
+.capa .titulo .letra:hover, .capa .titulo .letra.toque { translate: 0 -14px; color: var(--roxo-medio); }
+.capa.saindo .titulo .letra { animation: letra-sai 0.6s cubic-bezier(.55, 0, .45, 1) both; animation-delay: calc(var(--i) * 30ms); }
+
+@keyframes letra-entra {
+  from { opacity: 0; transform: translateY(60px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes letra-sai { to { opacity: 0; transform: translateY(-70px) scale(1.08); } }
+
+/* ---------- Subtítulo digitado ---------- */
+.capa .subtitulo {
+  margin: 0;
+  width: min(90vw, 620px);
+  height: 1.4em;
+  font-size: clamp(13px, 1.5vw, 17px);
+  color: var(--roxo-medio);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  animation: surgir 1s 0.7s ease-out both;
+}
+.capa .cursor { margin-left: 2px; color: #fff; animation: piscar 1s steps(1) infinite; }
+@keyframes piscar { 50% { opacity: 0; } }
+
+/* ---------- Deslize para entrar ---------- */
+.deslizar {
+  --altura: 60px;
+  --bola: 50px;
+  pointer-events: auto;
+  position: relative;
+  width: min(84vw, 340px);
+  height: var(--altura);
+  margin-top: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(220, 200, 255, 0.28);
+  overflow: hidden;
+  user-select: none;
+  touch-action: none;
+  animation: surgir 1s 0.9s ease-out both;
+}
+.deslizar-trilha {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: calc(var(--altura) / 2 + var(--x, 0px) + var(--bola) / 2);
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(200, 170, 255, 0.08), rgba(200, 170, 255, 0.4));
+}
+.deslizar-texto {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding-left: calc(var(--bola) + 10px);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #ebe8ff;
+  opacity: calc(1 - var(--progresso, 0) * 1.6);
+}
+.deslizar-bola {
+  position: absolute;
+  top: calc((var(--altura) - var(--bola)) / 2 - 1px);
+  left: calc((var(--altura) - var(--bola)) / 2 - 1px);
+  width: var(--bola);
+  height: var(--bola);
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: #4636ce;
+  display: grid;
+  place-items: center;
+  cursor: grab;
+  transform: translateX(var(--x, 0px));
+  box-shadow: 0 0 30px rgba(200, 170, 255, 0.55);
+}
+.deslizar-bola svg { width: 22px; height: 22px; transition: transform 0.25s; }
+.deslizar-bola:hover svg { transform: translateX(3px); }
+.deslizar-bola:focus, .deslizar-bola:focus-visible { outline: none; border-radius: 50%; }
+.deslizar.arrastando .deslizar-bola { cursor: grabbing; }
+.deslizar.voltando .deslizar-bola { transition: transform 0.45s cubic-bezier(.3, 1.5, .5, 1); }
+.deslizar.voltando .deslizar-trilha { transition: width 0.45s cubic-bezier(.3, 1.5, .5, 1); }
+.deslizar.voltando .deslizar-texto { transition: opacity 0.3s; }
+.deslizar.completando .deslizar-bola { transition: transform 0.22s cubic-bezier(.22, 1, .36, 1); }
+.deslizar.completando .deslizar-trilha { transition: width 0.22s cubic-bezier(.22, 1, .36, 1); }
+.deslizar.completando .deslizar-texto { transition: opacity 0.2s; }
+
+@keyframes pulso-texto { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+.deslizar-texto .pulso { animation: pulso-texto 2.6s ease-in-out infinite; }
+@keyframes surgir { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+
+/* O app "chega" por trás da capa: começa escondido e sobe um pouquinho enquanto acende (igual ao Portfólio). */
+.raiz-app { height: 100%; transition: opacity 0.7s cubic-bezier(.4, 0, .2, 1) 0.15s, transform 0.8s cubic-bezier(.22, 1, .36, 1) 0.15s; }
+.raiz-app.escondido { opacity: 0; transform: translateY(18px); }
+
+/* A página nunca rola (o app cabe na janela; só o conteúdo de cada aba rola por dentro). O app escondido sobe 18 px e
+   isso criava uma barra de rolagem na lateral da capa. */
+html, body { overflow: hidden; }
+
+/* Voltando para a capa pelo ícone do menu: ela chega de fora para dentro (inverso da saída). */
+.capa.voltando { animation: capa-volta 0.8s cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes capa-volta { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: scale(1); } }

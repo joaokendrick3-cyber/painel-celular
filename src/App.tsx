@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import Capa from './Capa'
 import type { ResumoCelular } from '@shared/celular'
 import { baixarResumo, lerCache, limparCache, supabase, temSupabase, VERSAO_ENTENDIDA } from './dados'
 import Entrada from './Entrada'
@@ -13,7 +14,7 @@ const ABAS: { id: Aba; nome: string; icone: string }[] = [
   { id: 'mais', nome: 'Mais', icone: 'M5 12h.01M12 12h.01M19 12h.01' }
 ]
 
-export default function App() {
+function Conteudo({ onCapa }: { onCapa: () => void }) {
   const [resumo, setResumo] = useState<ResumoCelular | null>(() => lerCache())
   const [logado, setLogado] = useState<boolean | null>(temSupabase ? null : true)
   const [aba, setAba] = useState<Aba>('inicio')
@@ -90,7 +91,7 @@ export default function App() {
   return (
     <div className="app">
       <main className="conteudo">
-        <Cabecalho resumo={resumo} carregando={carregando} erro={erro} onAtualizar={() => void atualizar()} />
+        <Cabecalho resumo={resumo} carregando={carregando} erro={erro} onAtualizar={() => void atualizar()} onCapa={onCapa} />
         {aba === 'inicio' && <Inicio r={resumo} irPara={(a) => setAba(a as Aba)} />}
         {aba === 'faltas' && <Faltas r={resumo} />}
         {aba === 'notas' && <Notas r={resumo} />}
@@ -119,23 +120,40 @@ export default function App() {
   )
 }
 
-function Cabecalho({ resumo, carregando, erro, onAtualizar }: { resumo: ResumoCelular; carregando: boolean; erro: string; onAtualizar: () => void }) {
+function Cabecalho({ resumo, carregando, erro, onAtualizar, onCapa }: { resumo: ResumoCelular; carregando: boolean; erro: string; onAtualizar: () => void; onCapa: () => void }) {
   const gerado = new Date(resumo.geradoEm)
   const horas = (Date.now() - gerado.getTime()) / 3600000
   const quando = gerado.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
   return (
     <header className="cabecalho">
-      <div>
-        <strong>PAINEL</strong>
-        <small className={horas > 6 ? 'velho' : ''}>
-          {horas > 6 ? 'Desatualizado · ' : 'Atualizado · '}
-          {quando.replace(',', ' às')}
-        </small>
+      <div className="marca-topo">
+        <img className="icone-topo" src={`${import.meta.env.BASE_URL}icone-192.png`} alt="" />
+        <div>
+          <strong className="marca-toque" onClick={onCapa} role="button" tabIndex={0}>PAINEL</strong>
+          <small className={horas > 6 ? 'velho' : ''}>
+            {horas > 6 ? 'Desatualizado · ' : 'Atualizado · '}
+            {quando.replace(',', ' às')}
+          </small>
+        </div>
       </div>
       <button className="botao-icone" onClick={onAtualizar} aria-label="Atualizar" disabled={carregando}>
         {carregando ? '…' : '↻'}
       </button>
       {erro && <p className="faixa-erro">{erro}</p>}
     </header>
+  )
+}
+
+/** A capa de abertura aparece ao abrir o app (e ao tocar em PAINEL no topo); o app já carrega os dados por trás dela. */
+export default function App() {
+  const [capa, setCapa] = useState(true)
+  const [volta, setVolta] = useState(0)
+  const entrou = useCallback(() => setCapa(false), [])
+  const saindo = useCallback(() => undefined, [])
+  return (
+    <>
+      <Conteudo onCapa={() => { setVolta((v) => v + 1); setCapa(true) }} />
+      {capa && <Capa key={volta} onEntrou={entrou} onSaindo={saindo} voltando={volta > 0} />}
+    </>
   )
 }
