@@ -79,14 +79,17 @@ export default function AvisosPush({ vapidPublica }: { vapidPublica?: string }) 
     negado: 'Os avisos estão bloqueados. Ative em Ajustes do iPhone, depois Notificações, depois PAINEL.'
   }
 
+  // Já ativado: o cartão some (a reinscrição automática acima continua rodando em silêncio). Só aparece se precisar de uma ação.
+  if (situacao === 'ativo' || situacao === 'carregando') return null
+
   return (
     <section className="cartao">
       <small className="rotulo">Avisos no celular</small>
-      <span className={situacao === 'ativo' ? 'verde' : 'suave'}>{texto[situacao]}</span>
+      <span className="suave">{texto[situacao]}</span>
       {msg && <span className="faixa-erro">{msg}</span>}
-      {(situacao === 'pedir' || situacao === 'ativo') && (
+      {situacao === 'pedir' && (
         <button className="botao" disabled={ocupado} onClick={() => void ativar()}>
-          {ocupado ? 'Ativando…' : situacao === 'ativo' ? 'Reativar avisos' : 'Ativar avisos'}
+          {ocupado ? 'Ativando…' : 'Ativar avisos'}
         </button>
       )}
     </section>
